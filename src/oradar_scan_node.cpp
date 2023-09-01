@@ -226,30 +226,30 @@ int main(int argc, char **argv)
   auto node = std::make_shared<rclcpp::Node>("oradar_ros"); // create a ROS2 Node
 
     // declare ros2 param
-  node->declare_parameter<std::string>("port_name", port);
-  node->declare_parameter<int>("baudrate", baudrate);
-  node->declare_parameter<double>("angle_max", angle_max);
-  node->declare_parameter<double>("angle_min", angle_min);
-  node->declare_parameter<double>("range_max", max_range);
-  node->declare_parameter<double>("range_min", min_range);
-  node->declare_parameter<bool>("clockwise", clockwise);
-  node->declare_parameter<int>("motor_speed", motor_speed);
-  node->declare_parameter<std::string>("device_model", device_model);
-  node->declare_parameter<std::string>("frame_id", frame_id);
-  node->declare_parameter<std::string>("scan_topic", scan_topic);
+  node->declare_parameter<std::string>("lidar.port_name", port);
+  node->declare_parameter<int>("lidar.baudrate", baudrate);
+  node->declare_parameter<double>("lidar.angle_max", angle_max);
+  node->declare_parameter<double>("lidar.angle_min", angle_min);
+  node->declare_parameter<double>("lidar.range_max", max_range);
+  node->declare_parameter<double>("lidar.range_min", min_range);
+  node->declare_parameter<bool>("lidar.clockwise", clockwise);
+  node->declare_parameter<int>("lidar.motor_speed", motor_speed);
+  node->declare_parameter<std::string>("lidar.device_model", device_model);
+  node->declare_parameter<std::string>("lidar.frame_id", frame_id);
+  node->declare_parameter<std::string>("lidar.scan_topic", scan_topic);
 
   // get ros2 param
-  node->get_parameter("port_name", port);
-  node->get_parameter("baudrate", baudrate);
-  node->get_parameter("angle_max", angle_max);
-  node->get_parameter("angle_min", angle_min);
-  node->get_parameter("range_max", max_range);
-  node->get_parameter("range_min", min_range);
-  node->get_parameter("clockwise", clockwise);
-  node->get_parameter("motor_speed", motor_speed);
-  node->get_parameter("device_model", device_model);
-  node->get_parameter("frame_id", frame_id);
-  node->get_parameter("scan_topic", scan_topic);
+  node->get_parameter("lidar.port_name", port);
+  node->get_parameter("lidar.baudrate", baudrate);
+  node->get_parameter("lidar.angle_max", angle_max);
+  node->get_parameter("lidar.angle_min", angle_min);
+  node->get_parameter("lidar.range_max", max_range);
+  node->get_parameter("lidar.range_min", min_range);
+  node->get_parameter("lidar.clockwise", clockwise);
+  node->get_parameter("lidar.motor_speed", motor_speed);
+  node->get_parameter("lidar.device_model", device_model);
+  node->get_parameter("lidar.frame_id", frame_id);
+  node->get_parameter("lidar.scan_topic", scan_topic);
 
   rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr publisher = node->create_publisher<sensor_msgs::msg::LaserScan>(scan_topic, 10);
   #endif
@@ -347,8 +347,6 @@ int main(int argc, char **argv)
 
       }
     }
-
-    device.Disconnect();
     
   }
 

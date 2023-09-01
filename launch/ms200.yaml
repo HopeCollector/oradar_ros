@@ -1,0 +1,33 @@
+MS200:
+  ros__parameters:
+    lidar:
+      device_model: "MS200"
+      frame_id: "laser_frame"
+      scan_topic: "MS200/scan"
+      port_name: "/dev/ttyUSB1"
+      baudrate: 230400
+      angle_min: 0.0
+      angle_max: 360.0
+      range_min: 0.05
+      range_max: 20.0
+      clockwise: false
+      motor_speed: 10
+    smotor:
+      port: "/dev/ttyUSB0"
+      id: 1
+      speed: 200.0
+    r2d:
+      scan2cld:
+        rotation_axis: [0.0, 1.0, 0.0]
+        rotate_speed: 200.0
+        is_positive_rotate: true
+        T_lb_lm:
+          row1: [1.0, 0.0, 0.0, 0.0]
+          row2: [0.0, 1.0, 0.0, 0.0]
+          row3: [0.0, 0.0, 1.0, 0.0]
+          row4: [0.0, 0.0, 0.0, 1.0]
+        T_m_w:
+          row1: [1.0, 0.0, 0.0, 0.0]
+          row2: [0.0, 1.0, 0.0, 0.0]
+          row3: [0.0, 0.0, 1.0, 0.0]
+          row4: [0.0, 0.0, 0.0, 1.0]

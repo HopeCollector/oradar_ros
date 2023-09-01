@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import PathJoinSubstitution
 
 '''
 parameters=[
@@ -26,17 +28,9 @@ def generate_launch_description():
       name='MS200',
       output='screen',
       parameters=[
-        {'device_model': 'MS200'},
-        {'frame_id': 'laser_frame'},
-        {'scan_topic': 'MS200/scan'},
-        {'port_name': '/dev/ttyACM0'},
-        {'baudrate': 230400},
-        {'angle_min': 0.0},
-        {'angle_max': 360.0},
-        {'range_min': 0.05},
-        {'range_max': 20.0},
-        {'clockwise': False},
-        {'motor_speed': 10}
+        PathJoinSubstitution([
+            FindPackageShare("oradar_lidar"),
+            "launch/ms200.yaml"])
       ]
   )
 
