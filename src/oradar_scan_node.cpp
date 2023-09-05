@@ -7,6 +7,7 @@
 #elif ROS2_FOUND
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #endif
 #include <vector>
 #include <iostream>
@@ -107,10 +108,11 @@ void publish_msg(ros::Publisher *pub, full_scan_data_st *scan_frame, ros::Time s
 }
 
 #elif ROS2_FOUND
-void publish_msg(rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr &pub, full_scan_data_st *scan_frame, rclcpp::Time start,
-                 double scan_time, std::string frame_id, bool clockwise,
-                 double angle_min, double angle_max, double min_range, double max_range)
-{
+void publish_msg(
+    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr &pub,
+    r2d::scan2cld &cvt, full_scan_data_st *scan_frame, rclcpp::Time start,
+    double scan_time, std::string frame_id, bool clockwise, double angle_min,
+    double angle_max, double min_range, double max_range, double motor_rad) {
   sensor_msgs::msg::LaserScan scanMsg;
   int point_nums = scan_frame->vailtidy_point_num;
 
@@ -187,7 +189,8 @@ void publish_msg(rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr &pub,
     }
   }
 
-  pub->publish(scanMsg);
+  scanMsg.intensities[0] = motor_rad;
+  pub->publish(*(cvt.process(scanMsg)));
 }
 #endif
 
@@ -229,6 +232,7 @@ int main(int argc, char **argv)
   #elif ROS2_FOUND
   rclcpp::init(argc, argv);
   auto node = std::make_shared<rclcpp::Node>("oradar_ros"); // create a ROS2 Node
+  r2d::scan2cld cvt(node);
 
     // declare ros2 param
   node->declare_parameter<std::string>("lidar.port_name", port);
@@ -262,7 +266,7 @@ int main(int argc, char **argv)
   node->get_parameter("smotor.id", smotor_id);
   node->get_parameter("smotor.speed", smotor_speed);
 
-  rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr publisher = node->create_publisher<sensor_msgs::msg::LaserScan>(scan_topic, 10);
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr publisher = node->create_publisher<sensor_msgs::msg::PointCloud2>(scan_topic, 10);
   #endif
   auto motor = smotor::create_rmd_motor(smotor_port, smotor_id);
   OrdlidarDriver device(type, model);
@@ -331,14 +335,13 @@ int main(int argc, char **argv)
     while (rclcpp::ok())
     #endif
     {
+      auto ang = Degree2Rad(motor->cur_pose().value());
       #ifdef ROS_FOUND
       start_scan_time = ros::Time::now();
       #elif ROS2_FOUND
       start_scan_time = node->now();
       #endif
-      auto ang = Degree2Rad(motor->cur_pose().value());
       ret = device.GrabFullScanBlocking(scan_data, 1000);
-      scan_data.data[0].intensity = ang;
       #ifdef ROS_FOUND
       end_scan_time = ros::Time::now();
       scan_duration = (end_scan_time - start_scan_time).toSec();
@@ -355,8 +358,8 @@ int main(int argc, char **argv)
         publish_msg(&scan_pub, &scan_data, start_scan_time, scan_duration, frame_id,
                     clockwise, angle_min, angle_max, min_range, max_range);
         #elif ROS2_FOUND
-        publish_msg(publisher, &scan_data, start_scan_time, scan_duration, frame_id,
-            clockwise, angle_min, angle_max, min_range, max_range);
+        publish_msg(publisher, cvt, &scan_data, start_scan_time, scan_duration, frame_id,
+            clockwise, angle_min, angle_max, min_range, max_range, ang);
         #endif
 
       }
