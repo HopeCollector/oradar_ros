@@ -44,6 +44,8 @@ if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
   #find_package(rclcpp REQUIRED)
   find_package(sensor_msgs REQUIRED)
   find_package(std_msgs REQUIRED) 
+  find_package(serial_motor REQUIRED)
+  find_package(r2d COMPONENTS scan2cld REQUIRED)
   include_directories(${rclcpp_INCLUDE_DIRS})
 
 else(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
@@ -112,7 +114,7 @@ endif(roscpp_FOUND)
 #Ros2#
 if(rclcpp_FOUND AND ${COMPILE_METHOD} STREQUAL "COLCON")
   ament_target_dependencies(oradar_scan rclcpp sensor_msgs)
-  target_link_libraries(oradar_scan oradar_sdk pthread)
+  target_link_libraries(oradar_scan oradar_sdk pthread r2d::scan2cld serial_motor::serial_motor)
   
   install(TARGETS oradar_scan
   DESTINATION lib/${PROJECT_NAME}

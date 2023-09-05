@@ -15,6 +15,8 @@
 #include <cmath>
 #include "src/ord_lidar_driver.h"
 #include <sys/time.h>
+#include "r2d/scan2cld.hpp"
+#include "serial_motor/motor.hpp"
 
 using namespace std;
 using namespace ordlidar;

@@ -11,6 +11,8 @@
 
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
+  <depend>serial_motor</depend>
+  <depend>r2d</depend>
 
   <exec_depend>ros2launch</exec_depend>
 
