@@ -196,6 +196,9 @@ int main(int argc, char **argv)
   std::string frame_id, scan_topic;
   std::string port;
   std::string device_model;
+  std::string smotor_port;
+  int smotor_id;
+  double smotor_speed;
 
   double min_thr = 0.0, max_thr = 0.0, cur_speed = 0.0;
   int baudrate = 230400;
@@ -239,6 +242,9 @@ int main(int argc, char **argv)
   node->declare_parameter<std::string>("lidar.device_model", device_model);
   node->declare_parameter<std::string>("lidar.frame_id", frame_id);
   node->declare_parameter<std::string>("lidar.scan_topic", scan_topic);
+  node->declare_parameter<std::string>("smotor.port", smotor_port);
+  node->declare_parameter<int>("smotor.id", smotor_id);
+  node->declare_parameter<double>("smotor.speed", smotor_speed);
 
   // get ros2 param
   node->get_parameter("lidar.port_name", port);
@@ -252,10 +258,13 @@ int main(int argc, char **argv)
   node->get_parameter("lidar.device_model", device_model);
   node->get_parameter("lidar.frame_id", frame_id);
   node->get_parameter("lidar.scan_topic", scan_topic);
+  node->get_parameter("smotor.port", smotor_port);
+  node->get_parameter("smotor.id", smotor_id);
+  node->get_parameter("smotor.speed", smotor_speed);
 
   rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr publisher = node->create_publisher<sensor_msgs::msg::LaserScan>(scan_topic, 10);
   #endif
-
+  auto motor = smotor::create_rmd_motor(smotor_port, smotor_id);
   OrdlidarDriver device(type, model);
   bool ret = false;
 
@@ -313,7 +322,8 @@ int main(int argc, char **argv)
     {
       device.SetRotationSpeed(motor_speed);
     }
-    
+
+    motor->rotate(smotor_speed);
 
     #ifdef ROS_FOUND
     while (ros::ok())
@@ -326,7 +336,9 @@ int main(int argc, char **argv)
       #elif ROS2_FOUND
       start_scan_time = node->now();
       #endif
+      auto ang = Degree2Rad(motor->cur_pose().value());
       ret = device.GrabFullScanBlocking(scan_data, 1000);
+      scan_data.data[0].intensity = ang;
       #ifdef ROS_FOUND
       end_scan_time = ros::Time::now();
       scan_duration = (end_scan_time - start_scan_time).toSec();
@@ -349,6 +361,8 @@ int main(int argc, char **argv)
 
       }
     }
+
+    motor->pause();
     
   }
 
