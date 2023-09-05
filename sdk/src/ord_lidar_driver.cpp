@@ -373,6 +373,9 @@ namespace ordlidar
 		{
 			// retval = lidar_ptr->serial_->available();
 			retval = lidar_ptr->serial_->waitfordata(wait_size, 500, &recv_size);
+			if (recv_size > TMPBUFF_SIZE) {
+				continue;
+			}
 			if (retval == 0)
 			{
 				lidar_ptr->valid_data_ = 1;
@@ -491,6 +494,7 @@ namespace ordlidar
 
 	void OrdlidarDriver::Disconnect()
 	{
+		std::cerr << "disconnect" << std::endl;
 		rx_thread_exit_flag_ = true;
 		if (serial_)
 		{

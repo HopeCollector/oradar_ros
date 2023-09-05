@@ -31,7 +31,8 @@ def generate_launch_description():
         PathJoinSubstitution([
             FindPackageShare("oradar_lidar"),
             "launch/ms200.yaml"])
-      ]
+      ],
+      # prefix=["gdbserver localhost:3000"]
   )
 
   # base_link to laser_frame tf node
